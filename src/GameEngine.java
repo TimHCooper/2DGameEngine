@@ -1,3 +1,4 @@
+import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
@@ -18,7 +19,7 @@ public class GameEngine implements GLEventListener, KeyListener
 {
 	int BSSwidth, BSSheight;
 	int[] sprites;
-	int tileSize;
+	int tileSize, barSizeW, barSizeH;
 	
 	public static void main(String[] args)
 	{
@@ -32,13 +33,13 @@ public class GameEngine implements GLEventListener, KeyListener
 		
 		GLCanvas glcanvas = new GLCanvas(capabilities);
 		glcanvas.addGLEventListener(this);
-		glcanvas.setSize(480, 480);
+		glcanvas.setSize(500, 500);
 		
 		final JFrame frame = new JFrame("2D Game Engine");
 		
 		frame.getContentPane().add(glcanvas);
-		frame.setSize(glcanvas.getPreferredSize());
-		
+		frame.getContentPane().setPreferredSize(glcanvas.getPreferredSize());
+		frame.pack();
 		frame.addKeyListener(this);
 		
 		//frame.setResizable(false);
@@ -104,7 +105,26 @@ public class GameEngine implements GLEventListener, KeyListener
 
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) 
 	{
-		
+		System.out.println("Width: " + width + "\nHeight: " + height + "\n");
+		if(width > height)
+		{
+			tileSize = width / 16;
+			barSizeW = (width - height) / 2;
+			barSizeH = 0;
+		}
+		else if(height > width)
+		{
+			tileSize = height / 16;
+			barSizeH = (height - width) / 2;
+			barSizeW = 0;
+		}
+		else
+		{
+			tileSize = width / 16;
+			barSizeH = 0;
+			barSizeW = 0;
+		}
+		System.out.println("Tile Size: " + tileSize + "\nBar Size Width: " + barSizeW + "\nBar Size Height: " + barSizeH);
 	}
 	
 	public void draw(GL2 gl)
