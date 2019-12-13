@@ -1,4 +1,3 @@
-import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
@@ -20,6 +19,7 @@ public class GameEngine implements GLEventListener, KeyListener
 	int BSSwidth, BSSheight;
 	int[] sprites;
 	int tileSize, barSizeW, barSizeH;
+	int screenWidth, screenHeight;
 	
 	public static void main(String[] args)
 	{
@@ -46,8 +46,8 @@ public class GameEngine implements GLEventListener, KeyListener
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 		
-		final FPSAnimator animator = new FPSAnimator(glcanvas, 60, true);
-		animator.start();
+		//final FPSAnimator animator = new FPSAnimator(glcanvas, 60, true);
+		//animator.start();
 	}
 
 	public void keyPressed(KeyEvent k) 
@@ -108,14 +108,14 @@ public class GameEngine implements GLEventListener, KeyListener
 		System.out.println("Width: " + width + "\nHeight: " + height + "\n");
 		if(width > height)
 		{
-			tileSize = width / 16;
-			barSizeW = (width - height) / 2;
+			tileSize = height / 16;
+			barSizeW = (width - (tileSize * 16)) / 2;
 			barSizeH = 0;
 		}
 		else if(height > width)
 		{
-			tileSize = height / 16;
-			barSizeH = (height - width) / 2;
+			tileSize = width / 16;
+			barSizeH = (height - (tileSize * 16)) / 2;
 			barSizeW = 0;
 		}
 		else
@@ -124,27 +124,59 @@ public class GameEngine implements GLEventListener, KeyListener
 			barSizeH = 0;
 			barSizeW = 0;
 		}
-		System.out.println("Tile Size: " + tileSize + "\nBar Size Width: " + barSizeW + "\nBar Size Height: " + barSizeH);
+		screenWidth = width;
+		screenHeight = height;
 	}
 	
 	public void draw(GL2 gl)
 	{
+		int tileX = 1;
+		int tileY = 1;
+		
 		gl.glBindTexture(GL2.GL_TEXTURE_2D, sprites[0]);
 		gl.glBegin(GL2.GL_QUADS);
 		
-		gl.glTexCoord2d(1.0, 0.75);
-		gl.glVertex2d(-0.2, -0.2);
+		double[][] vertices = getRelativeSize(tileX, tileY);
 		
 		gl.glTexCoord2d(1.0, 1.0);
-		gl.glVertex2d(-0.2, 0.2);
+		gl.glVertex2d(vertices[0][0], vertices[0][1]);
 		
-		gl.glTexCoord2d(0.75, 1.0);
-		gl.glVertex2d(0.2, 0.2);
+		gl.glTexCoord2d(1.0, 0.75);
+		gl.glVertex2d(vertices[1][0], vertices[1][1]);
 		
 		gl.glTexCoord2d(0.75, 0.75);
-		gl.glVertex2d(0.2, -0.2);
+		gl.glVertex2d(vertices[2][0], vertices[2][1]);
+		
+		gl.glTexCoord2d(0.75, 1.0);
+		gl.glVertex2d(vertices[3][0], vertices[3][1]);
 		
 		gl.glEnd();
 		gl.glFlush();
+	}
+	
+	public double[][] getRelativeSize(int tileX, int tileY)
+	{
+		double[][] toReturn = new double[4][2];
+		//System.out.println(tileSize);
+		
+		System.out.println((barSizeW + (tileX-1) * tileSize) / screenWidth);
+		toReturn[0][0] = (barSizeW + (tileX-1) * tileSize) / screenWidth;
+		toReturn[0][1] = (barSizeH + (tileY-1) * tileSize) / screenHeight;
+		
+		toReturn[1][0] = toReturn[0][0];
+		toReturn[1][1] = (barSizeH + (tileY) * tileSize) / screenHeight;
+		
+		toReturn[2][0] = (barSizeW + (tileX) * tileSize) / screenWidth;
+		toReturn[2][1] = toReturn[1][1];
+		
+		toReturn[3][0] = toReturn[2][0];
+		toReturn[3][1] = toReturn[1][1];
+		
+		for(int i = 0; i < 4; i++)
+		{
+			System.out.println(toReturn[i][0] + ", " + toReturn[i][1]);
+		}
+		
+		return toReturn;
 	}
 }
