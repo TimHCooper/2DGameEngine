@@ -20,6 +20,10 @@ public class GameEngine implements GLEventListener, KeyListener
 	int[] sprites;
 	int tileSize, barSizeW, barSizeH;
 	int screenWidth, screenHeight;
+	int tileX = 0;
+	int tileY = 0;
+	int activeSprite = 0;
+	int animStage = 0;
 	
 	public static void main(String[] args)
 	{
@@ -33,7 +37,7 @@ public class GameEngine implements GLEventListener, KeyListener
 		
 		GLCanvas glcanvas = new GLCanvas(capabilities);
 		glcanvas.addGLEventListener(this);
-		glcanvas.setSize(500, 500);
+		glcanvas.setSize(720, 480);
 		
 		final JFrame frame = new JFrame("2D Game Engine");
 		
@@ -46,13 +50,41 @@ public class GameEngine implements GLEventListener, KeyListener
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 		
-		//final FPSAnimator animator = new FPSAnimator(glcanvas, 60, true);
-		//animator.start();
+		final FPSAnimator animator = new FPSAnimator(glcanvas, 60, true);
+		animator.start();
 	}
 
 	public void keyPressed(KeyEvent k) 
 	{
+		int key = k.getKeyCode();
+		switch(key)
+		{
+		case KeyEvent.VK_W:
+			tileY--;
+			break;
+		case KeyEvent.VK_S:
+			tileY++;
+			break;
+		case KeyEvent.VK_D:
+			tileX++;
+			break;
+		case KeyEvent.VK_A:
+			tileX--;
+			break;
+		case KeyEvent.VK_SPACE:
+			activeSprite = ++activeSprite % 2;
+			break;
+		}
+		if(tileY < 0)
+			tileY= 0;
+		if(tileY > 15)
+			tileY = 15;
+		if(tileX < 0)
+			tileX=0;
+		if(tileX > 15)
+			tileX=15;
 		
+		animStage = ++animStage % 4;
 	}
 
 	public void keyReleased(KeyEvent k) 
@@ -105,7 +137,7 @@ public class GameEngine implements GLEventListener, KeyListener
 
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) 
 	{
-		System.out.println("Width: " + width + "\nHeight: " + height + "\n");
+		//System.out.println("Width: " + width + "\nHeight: " + height + "\n");
 		if(width > height)
 		{
 			tileSize = height / 16;
@@ -129,25 +161,22 @@ public class GameEngine implements GLEventListener, KeyListener
 	}
 	
 	public void draw(GL2 gl)
-	{
-		int tileX = 1;
-		int tileY = 1;
-		
-		gl.glBindTexture(GL2.GL_TEXTURE_2D, sprites[0]);
+	{	
+		gl.glBindTexture(GL2.GL_TEXTURE_2D, sprites[activeSprite]);
 		gl.glBegin(GL2.GL_QUADS);
 		
 		double[][] vertices = getRelativeSize(tileX, tileY);
 		
-		gl.glTexCoord2d(1.0, 1.0);
+		gl.glTexCoord2d(1.0 - (animStage * 0.25), 1.0);
 		gl.glVertex2d(vertices[0][0], vertices[0][1]);
 		
-		gl.glTexCoord2d(1.0, 0.75);
+		gl.glTexCoord2d(1.0 - (animStage * 0.25), 0.75);
 		gl.glVertex2d(vertices[1][0], vertices[1][1]);
 		
-		gl.glTexCoord2d(0.75, 0.75);
+		gl.glTexCoord2d(0.75 - (animStage * 0.25), 0.75);
 		gl.glVertex2d(vertices[2][0], vertices[2][1]);
 		
-		gl.glTexCoord2d(0.75, 1.0);
+		gl.glTexCoord2d(0.75 - (animStage * 0.25), 1.0);
 		gl.glVertex2d(vertices[3][0], vertices[3][1]);
 		
 		gl.glEnd();
@@ -157,25 +186,18 @@ public class GameEngine implements GLEventListener, KeyListener
 	public double[][] getRelativeSize(int tileX, int tileY)
 	{
 		double[][] toReturn = new double[4][2];
-		//System.out.println(tileSize);
 		
-		System.out.println((barSizeW + (tileX-1) * tileSize) / screenWidth);
-		toReturn[0][0] = (barSizeW + (tileX-1) * tileSize) / screenWidth;
-		toReturn[0][1] = (barSizeH + (tileY-1) * tileSize) / screenHeight;
+		toReturn[0][0] = (double) ((barSizeW + (tileX * tileSize)) * 2.0 / screenWidth) - 1.0;
+		toReturn[0][1] = (double) -((barSizeH + (tileY * tileSize)) * 2.0 / screenHeight) + 1.0;
 		
 		toReturn[1][0] = toReturn[0][0];
-		toReturn[1][1] = (barSizeH + (tileY) * tileSize) / screenHeight;
+		toReturn[1][1] = (double) -((barSizeH + ((tileY + 1) * tileSize) - 1) * 2.0 / screenHeight) + 1.0;
 		
-		toReturn[2][0] = (barSizeW + (tileX) * tileSize) / screenWidth;
+		toReturn[2][0] = (double) ((barSizeW + ((tileX + 1) * tileSize) - 1) * 2.0 / screenWidth) - 1.0;
 		toReturn[2][1] = toReturn[1][1];
 		
 		toReturn[3][0] = toReturn[2][0];
-		toReturn[3][1] = toReturn[1][1];
-		
-		for(int i = 0; i < 4; i++)
-		{
-			System.out.println(toReturn[i][0] + ", " + toReturn[i][1]);
-		}
+		toReturn[3][1] = toReturn[0][1];
 		
 		return toReturn;
 	}
