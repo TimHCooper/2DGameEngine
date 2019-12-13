@@ -46,7 +46,6 @@ public class GameEngine implements GLEventListener, KeyListener
 		frame.pack();
 		frame.addKeyListener(this);
 		
-		//frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 		
@@ -100,11 +99,11 @@ public class GameEngine implements GLEventListener, KeyListener
 	public void display(GLAutoDrawable drawable) 
 	{
 		GL2 gl = drawable.getGL().getGL2();
+		gl.glClearColor(0.0f,  0.0f,  0.0f,  1.0f);
 		gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 		gl.glLoadIdentity();
 		
 		draw(gl);
-		
 	}
 
 	public void dispose(GLAutoDrawable drawable) 
@@ -137,7 +136,6 @@ public class GameEngine implements GLEventListener, KeyListener
 
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) 
 	{
-		//System.out.println("Width: " + width + "\nHeight: " + height + "\n");
 		if(width > height)
 		{
 			tileSize = height / 16;
@@ -167,16 +165,16 @@ public class GameEngine implements GLEventListener, KeyListener
 		
 		double[][] vertices = getRelativeSize(tileX, tileY);
 		
-		gl.glTexCoord2d(1.0 - (animStage * 0.25), 1.0);
+		gl.glTexCoord2d((animStage * 0.25), 1.0);
 		gl.glVertex2d(vertices[0][0], vertices[0][1]);
 		
-		gl.glTexCoord2d(1.0 - (animStage * 0.25), 0.75);
+		gl.glTexCoord2d((animStage * 0.25), 0.75);
 		gl.glVertex2d(vertices[1][0], vertices[1][1]);
 		
-		gl.glTexCoord2d(0.75 - (animStage * 0.25), 0.75);
+		gl.glTexCoord2d((animStage * 0.25) + 0.25, 0.75);
 		gl.glVertex2d(vertices[2][0], vertices[2][1]);
 		
-		gl.glTexCoord2d(0.75 - (animStage * 0.25), 1.0);
+		gl.glTexCoord2d((animStage * 0.25) + 0.25, 1.0);
 		gl.glVertex2d(vertices[3][0], vertices[3][1]);
 		
 		gl.glEnd();
