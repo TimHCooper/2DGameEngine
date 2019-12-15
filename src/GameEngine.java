@@ -2,7 +2,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
 
-import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
 import com.jogamp.opengl.GL2;
@@ -16,14 +15,13 @@ import com.jogamp.opengl.util.texture.TextureIO;
 
 public class GameEngine implements GLEventListener, KeyListener
 {
-	int BSSwidth, BSSheight;
 	int[] sprites;
 	int tileSize, barSizeW, barSizeH;
 	int screenWidth, screenHeight;
 	int tileX = 0;
 	int tileY = 0;
 	int activeSprite = 0;
-	int animStage = 0;
+	byte animStage = 0, animDir = 0;
 	
 	public static void main(String[] args)
 	{
@@ -60,15 +58,19 @@ public class GameEngine implements GLEventListener, KeyListener
 		{
 		case KeyEvent.VK_W:
 			tileY--;
+			animDir = 3;
 			break;
 		case KeyEvent.VK_S:
 			tileY++;
+			animDir = 0;
 			break;
 		case KeyEvent.VK_D:
 			tileX++;
+			animDir = 2;
 			break;
 		case KeyEvent.VK_A:
 			tileX--;
+			animDir = 1;
 			break;
 		case KeyEvent.VK_SPACE:
 			activeSprite = ++activeSprite % 2;
@@ -83,7 +85,7 @@ public class GameEngine implements GLEventListener, KeyListener
 		if(tileX > 15)
 			tileX=15;
 		
-		animStage = ++animStage % 4;
+		animStage = (byte) (++animStage % 4);
 	}
 
 	public void keyReleased(KeyEvent k) 
@@ -121,8 +123,6 @@ public class GameEngine implements GLEventListener, KeyListener
 		{
 			File BSS = new File(System.getProperty("user.dir") + "/Assets/Sprites/basicSpriteSheet.png");
 			File BSS2 = new File(System.getProperty("user.dir") + "/Assets/Sprites/basicSpriteSheet2.png");
-			BSSwidth = ImageIO.read(BSS).getWidth();
-			BSSheight = ImageIO.read(BSS).getHeight();
 			
 			sprites = new int[2];
 			sprites[0] = TextureIO.newTexture(BSS, true).getTextureObject(gl);
@@ -165,16 +165,16 @@ public class GameEngine implements GLEventListener, KeyListener
 		
 		double[][] vertices = getRelativeSize(tileX, tileY);
 		
-		gl.glTexCoord2d((animStage * 0.25), 1.0);
+		gl.glTexCoord2d((animStage * 0.25), 1.0 - (animDir * 0.25));
 		gl.glVertex2d(vertices[0][0], vertices[0][1]);
 		
-		gl.glTexCoord2d((animStage * 0.25), 0.75);
+		gl.glTexCoord2d((animStage * 0.25), 0.75 - (animDir * 0.25));
 		gl.glVertex2d(vertices[1][0], vertices[1][1]);
 		
-		gl.glTexCoord2d((animStage * 0.25) + 0.25, 0.75);
+		gl.glTexCoord2d((animStage * 0.25) + 0.25, 0.75 - (animDir * 0.25));
 		gl.glVertex2d(vertices[2][0], vertices[2][1]);
 		
-		gl.glTexCoord2d((animStage * 0.25) + 0.25, 1.0);
+		gl.glTexCoord2d((animStage * 0.25) + 0.25, 1.0 - (animDir * 0.25));
 		gl.glVertex2d(vertices[3][0], vertices[3][1]);
 		
 		gl.glEnd();
