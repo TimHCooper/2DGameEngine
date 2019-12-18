@@ -31,31 +31,32 @@ public class Room
 			
 			for(int i = 1; i < 19; i++)
 			{
-				randSelect[i - 1] = new Vector2d(i/36.0, 1.0/36.0);
+				randSelect[i - 1] = new Vector2d(i/39.0, 36.0/38.0);
 			}
 			for(int i = 0; i < 20; i++)
 			{
-				randSelect[i + 18] = new Vector2d(i/36.0, 2.0/36.0);
+				randSelect[i + 18] = new Vector2d((i + 1)/39.0, 35.0/38.0);
 			}
 			for(int i = 0; i < sizeX; i++)
 			{
-				for(int ii = 0; ii < sizeY; i++)
+				for(int ii = 0; ii < sizeY; ii++)
 				{
-					int random = rand.nextInt(76);
-					if(random > 38)
-					{
-						roomTexArray[i][ii][0] = new Vector2d(0.0, 1.0/36.0);
-						roomTexArray[i][ii][1] = new Vector2d(0.0, 2.0/36.0);
-						roomTexArray[i][ii][2] = new Vector2d(1.0/36.0, 2.0/36.0);
-						roomTexArray[i][ii][3] = new Vector2d(1.0/36.0, 1.0/36.0);
+					int random = rand.nextInt(100);
+					if(random < 62)
+					{	
+						roomTexArray[i][ii][0] = new Vector2d(1.0/39.0, 36.0/38.0);
+						roomTexArray[i][ii][1] = new Vector2d(1.0/39.0, 35.0/38.0);
+						roomTexArray[i][ii][2] = new Vector2d(2.0/39.0, 35.0/38.0);
+						roomTexArray[i][ii][3] = new Vector2d(2.0/39.0, 36.0/38.0);
+						
 					}
 					else
 					{
-						int index = random - 38;
+						int index = random - 62;
 						roomTexArray[i][ii][0] = randSelect[index];
-						roomTexArray[i][ii][1] = new Vector2d(randSelect[index].x, randSelect[index].y + 1.0/36.0);
-						roomTexArray[i][ii][2] = new Vector2d(randSelect[index].x + 1.0/36.0, randSelect[index].y + 1.0/36.0);
-						roomTexArray[i][ii][3] = new Vector2d(randSelect[index].x + 1.0/36.0, randSelect[index].y);
+						roomTexArray[i][ii][1] = new Vector2d(randSelect[index].x, randSelect[index].y - 1.0/39.0);
+						roomTexArray[i][ii][2] = new Vector2d(randSelect[index].x + 1.0/39.0, randSelect[index].y - 1.0/38.0);
+						roomTexArray[i][ii][3] = new Vector2d(randSelect[index].x + 1.0/39.0, randSelect[index].y);
 					}
 				}
 			}
