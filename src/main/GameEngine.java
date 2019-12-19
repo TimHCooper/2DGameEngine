@@ -1,5 +1,7 @@
 package main;
 
+import gameObjects.Player;
+
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
@@ -27,6 +29,7 @@ public class GameEngine implements GLEventListener, KeyListener
 	byte animStage = 0, animDir = 0, activeRoom = 0, activeTileMap = 0;
 	Room[] rooms;
 	public final static byte MOVE_FRAMES = 10;
+	Player player;
 	
 	public static void main(String[] args)
 	{
@@ -36,7 +39,7 @@ public class GameEngine implements GLEventListener, KeyListener
 	public GameEngine()
 	{
 		rooms = new Room[1];
-		rooms[0] = new Room(16, 16, Room.TYPE_OVERWORLD);
+		rooms[0] = new Room(16, 16, Room.TYPE_OVERWORLD, new Vector2d(0, 0));
 		
 		GLProfile profile = GLProfile.get(GLProfile.GL2);
 		GLCapabilities capabilities = new GLCapabilities(profile);
@@ -79,9 +82,6 @@ public class GameEngine implements GLEventListener, KeyListener
 		case KeyEvent.VK_A:
 			tileX--;
 			animDir = 1;
-			break;
-		case KeyEvent.VK_SPACE:
-			activeSprite = ++activeSprite % 2;
 			break;
 		}
 		if(tileY < 0)
@@ -131,11 +131,13 @@ public class GameEngine implements GLEventListener, KeyListener
 		try 
 		{
 			File BSS = new File(System.getProperty("user.dir") + "/Assets/Sprites/basicSpriteSheet.png");
-			File BSS2 = new File(System.getProperty("user.dir") + "/Assets/Sprites/basicSpriteSheet2.png");
 			
-			sprites = new int[2];
+			sprites = new int[1];
 			sprites[0] = TextureIO.newTexture(BSS, true).getTextureObject(gl);
-			sprites[1] = TextureIO.newTexture(BSS2, true).getTextureObject(gl);
+			
+			Vector2d[] playerTexCoords = {new Vector2d(0, 0), new Vector2d(0, .25), new Vector2d(.25,.25), new Vector2d(.25,0)};
+			
+			rooms[0].add(new Player(BSS, playerTexCoords, rooms[0].startPos));
 			
 			File over = new File(System.getProperty("user.dir") + "/Assets/TileSets/terrain.png");
 			

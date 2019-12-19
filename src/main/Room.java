@@ -1,6 +1,13 @@
 package main;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Random;
+
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.util.texture.TextureIO;
+
+import gameObjects.*;
 
 public class Room 
 {
@@ -12,12 +19,18 @@ public class Room
 	
 	int sizeX, sizeY, type;
 	Vector2d[][][] roomTexArray;
+	ArrayList<GameObject> objects;
+	ArrayList<GameObject> toTick;
+	public Vector2d startPos;
+	@SuppressWarnings("unused")
+	private int pIndex;
 	
-	public Room(int x, int y, int t)
+	public Room(int x, int y, int t, Vector2d pos)
 	{
 		sizeX = x;
 		sizeY = y;
 		type = t;
+		startPos = pos;
 		
 		roomTexArray = new Vector2d[sizeX][sizeY][4];
 		
@@ -74,5 +87,30 @@ public class Room
 	public Room(File room)
 	{
 		
+	}
+	
+	public void add(GameObject go)
+	{
+		objects.add(go);
+		if(go instanceof Player)
+			pIndex = objects.indexOf(go);
+		if(go instanceof Movable || go instanceof Animated)
+			toTick.add(go);
+	}
+	
+	public int[] initSprites(GL2 gl)
+	{
+		HashSet<File> files = new HashSet<File>();
+		for(GameObject object : objects)
+		{
+			files.add(object.textureFile);
+		}
+		int[] toReturn = new int[files.size()];
+		int i = 0;
+		for(File file : files)
+		{
+			toReturn[i] = TextureIO.newTexture(file, true).getTextureObject(gl);
+			i++;
+		}
 	}
 }
