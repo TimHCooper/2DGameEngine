@@ -22,11 +22,13 @@ public class Room
 	ArrayList<GameObject> objects;
 	ArrayList<GameObject> toTick;
 	public Vector2d startPos;
-	@SuppressWarnings("unused")
 	private int pIndex;
 	
 	public Room(int x, int y, int t, Vector2d pos)
 	{
+		objects = new ArrayList<GameObject>();
+		toTick = new ArrayList<GameObject>();
+		
 		sizeX = x;
 		sizeY = y;
 		type = t;
@@ -109,8 +111,18 @@ public class Room
 		int i = 0;
 		for(File file : files)
 		{
+			try {
 			toReturn[i] = TextureIO.newTexture(file, true).getTextureObject(gl);
 			i++;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
+		return toReturn;
+	}
+	
+	public Player getPlayer()
+	{
+		return (Player) objects.get(pIndex);
 	}
 }

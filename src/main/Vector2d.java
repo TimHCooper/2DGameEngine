@@ -15,6 +15,11 @@ public class Vector2d
 		in[0] = x;
 		in[1] = y;
 	}
+	public Vector2d(Vector2d in)
+	{
+		x = in.x;
+		y = in.y;
+	}
 	public void add(Vector2d in)
 	{
 		x += in.x;

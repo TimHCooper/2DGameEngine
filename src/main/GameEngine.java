@@ -68,30 +68,26 @@ public class GameEngine implements GLEventListener, KeyListener
 		switch(key)
 		{
 		case KeyEvent.VK_W:
-			tileY--;
-			animDir = 3;
+			rooms[activeRoom].getPlayer().move(new Vector2d(0, -1));
 			break;
 		case KeyEvent.VK_S:
-			tileY++;
-			animDir = 0;
+			rooms[activeRoom].getPlayer().move(new Vector2d(0, 1));
 			break;
 		case KeyEvent.VK_D:
-			tileX++;
-			animDir = 2;
+			rooms[activeRoom].getPlayer().move(new Vector2d(1, 0));
 			break;
 		case KeyEvent.VK_A:
-			tileX--;
-			animDir = 1;
+			rooms[activeRoom].getPlayer().move(new Vector2d(-1, 0));
 			break;
 		}
-		if(tileY < 0)
+		/*if(tileY < 0)
 			tileY= 0;
 		if(tileY > 15)
 			tileY = 15;
 		if(tileX < 0)
 			tileX=0;
 		if(tileX > 15)
-			tileX=15;
+			tileX=15;*/
 		
 		animStage = (byte) (++animStage % 4);
 	}
@@ -113,6 +109,7 @@ public class GameEngine implements GLEventListener, KeyListener
 		gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 		gl.glLoadIdentity();
 		
+		rooms[0].getPlayer().moveTick();
 		drawRoom(gl, rooms[0]);
 		drawChar(gl);
 	}
@@ -132,12 +129,10 @@ public class GameEngine implements GLEventListener, KeyListener
 		{
 			File BSS = new File(System.getProperty("user.dir") + "/Assets/Sprites/basicSpriteSheet.png");
 			
-			sprites = new int[1];
-			sprites[0] = TextureIO.newTexture(BSS, true).getTextureObject(gl);
-			
 			Vector2d[] playerTexCoords = {new Vector2d(0, 0), new Vector2d(0, .25), new Vector2d(.25,.25), new Vector2d(.25,0)};
 			
 			rooms[0].add(new Player(BSS, playerTexCoords, rooms[0].startPos));
+			sprites = rooms[0].initSprites(gl);
 			
 			File over = new File(System.getProperty("user.dir") + "/Assets/TileSets/terrain.png");
 			
@@ -179,7 +174,9 @@ public class GameEngine implements GLEventListener, KeyListener
 		gl.glBindTexture(GL2.GL_TEXTURE_2D, sprites[activeSprite]);
 		gl.glBegin(GL2.GL_QUADS);
 		
-		Vector2d[] vertices = getRelativeSize(tileX, tileY);
+		Player p = rooms[0].getPlayer();
+		
+		Vector2d[] vertices = getRelativeSize(p.position);
 		
 		gl.glTexCoord2d((animStage * 0.25), 1.0 - (animDir * 0.25));
 		gl.glVertex2d(vertices[0].x, vertices[0].y);
@@ -208,7 +205,7 @@ public class GameEngine implements GLEventListener, KeyListener
 			for(int ii = 0; ii < room.sizeY; ii++)
 			{
 				gl.glBegin(GL2.GL_QUADS);
-				vertices = getRelativeSize(i, ii);
+				vertices = getRelativeSize(new Vector2d(i, ii));
 				
 				gl.glTexCoord2d(roomTexArray[i][ii][0].x, roomTexArray[i][ii][0].y);
 				gl.glVertex2d(vertices[0].x, vertices[0].y);
@@ -228,17 +225,17 @@ public class GameEngine implements GLEventListener, KeyListener
 		}
 	}
 	
-	public Vector2d[] getRelativeSize(int tileX, int tileY)
+	public Vector2d[] getRelativeSize(Vector2d in)
 	{
 		Vector2d[] toReturn = new Vector2d[4];
 		
-		toReturn[0] = new Vector2d((double) ((barSizeW + (tileX * tileSize)) * 2.0 / screenWidth) - 1.0,
-				(double) -((barSizeH + (tileY * tileSize)) * 2.0 / screenHeight) + 1.0);
+		toReturn[0] = new Vector2d((double) ((barSizeW + (in.x * tileSize)) * 2.0 / screenWidth) - 1.0,
+				(double) -((barSizeH + (in.y * tileSize)) * 2.0 / screenHeight) + 1.0);
 		
 		toReturn[1] = new Vector2d(toReturn[0].x,
-				(double) -((barSizeH + 1 + ((tileY + 1) * tileSize) - 1) * 2.0 / screenHeight) + 1.0);
+				(double) -((barSizeH + 1 + ((in.y + 1) * tileSize) - 1) * 2.0 / screenHeight) + 1.0);
 		
-		toReturn[2] = new Vector2d((double) ((barSizeW + 1 + ((tileX + 1) * tileSize) - 1) * 2.0 / screenWidth) - 1.0,
+		toReturn[2] = new Vector2d((double) ((barSizeW + 1 + ((in.x + 1) * tileSize) - 1) * 2.0 / screenWidth) - 1.0,
 				toReturn[1].y);
 		
 		toReturn[3] = new Vector2d(toReturn[2].x, toReturn[0].y);
